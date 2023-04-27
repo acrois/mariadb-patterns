@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  mariadb:
+    image: mariadb:10.3
+    command: [
+      "mysqld",
+      "--default-authentication-plugin=mysql_native_password",
+      "--bind-address=0.0.0.0",
+      "--innodb-flush-method=fsync",
+      "--server-id=1337",
+      "--binlog-format=row",
+      "--datadir=/var/lib/mysql",
+      "--log-bin=/var/lib/mysql/master",
+      "--binlog-format=row",
+      "--binlog-ignore-db=maxwell",
+      "--log-error=/dev/stderr",
+      "--log_bin_trust_function_creators=ON",
+      "--event-scheduler=ON",
+      "--performance-schema=ON",
+      "--default-storage-engine=InnoDB",
+      "--sql-mode=NO_ENGINE_SUBSTITUTION",
+      "--max-connections=512",
+      "--wait-timeout=1200",
+      "--innodb-flush-log-at-trx-commit=1",
+      "--innodb-autoinc-lock-mode=2",
+      "--plugin-load-add=ha_blackhole",
+      "--expire-logs-days=0"
+    ]
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=developer
+      - MYSQL_USER=developer
+      - MYSQL_PASSWORD=developer
+volumes:
+  mysql-data:
